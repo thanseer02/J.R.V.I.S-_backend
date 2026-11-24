@@ -3,7 +3,6 @@ import 'package:schemantic/schemantic.dart';
 
 import '../config/ai_config.dart';
 import '../config/jarvis_prompts.dart';
-import '../models/chat_message.dart';
 import '../tools/app_info_tool.dart';
 import '../tools/calculator_tool.dart';
 import '../tools/date_time_tool.dart';

@@ -14,9 +14,9 @@ class Conversation {
     DateTime? createdAt,
     DateTime? updatedAt,
     List<ChatMessage>? messages,
-  })  : createdAt = createdAt ?? DateTime.now(),
-        updatedAt = updatedAt ?? DateTime.now(),
-        messages = List.unmodifiable(messages ?? []);
+  }) : createdAt = createdAt ?? DateTime.now(),
+       updatedAt = updatedAt ?? DateTime.now(),
+       messages = List.unmodifiable(messages ?? []);
 
   /// Total count of messages in this conversation.
   int get messageCount => messages.length;
@@ -54,11 +54,11 @@ class Conversation {
   }
 
   Map<String, dynamic> toJson() => {
-        'conversationId': conversationId,
-        'title': title,
-        'createdAt': createdAt.toIso8601String(),
-        'updatedAt': updatedAt.toIso8601String(),
-        'messageCount': messageCount,
-        'messages': messages.map((m) => m.toJson()).toList(),
-      };
+    'conversationId': conversationId,
+    'title': title,
+    'createdAt': createdAt.toIso8601String(),
+    'updatedAt': updatedAt.toIso8601String(),
+    'messageCount': messageCount,
+    'messages': messages.map((m) => m.toJson()).toList(),
+  };
 }

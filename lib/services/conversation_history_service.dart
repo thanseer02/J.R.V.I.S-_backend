@@ -13,13 +13,16 @@ class ConversationHistoryService {
   ConversationHistoryService({
     ConversationRepository? repository,
     Random? random,
-  })  : _repository = repository ?? InMemoryConversationRepository(),
-        _random = random ?? Random.secure();
+  }) : _repository = repository ?? InMemoryConversationRepository(),
+       _random = random ?? Random.secure();
 
   /// Generates a cryptographically random, collision-resistant unique identifier.
   String generateId([String prefix = 'conv']) {
     final timestamp = DateTime.now().microsecondsSinceEpoch;
-    final randomHex = List.generate(4, (_) => _random.nextInt(256).toRadixString(16).padLeft(2, '0')).join();
+    final randomHex = List.generate(
+      4,
+      (_) => _random.nextInt(256).toRadixString(16).padLeft(2, '0'),
+    ).join();
     return '${prefix}_${timestamp}_$randomHex';
   }
 
@@ -73,7 +76,9 @@ class ConversationHistoryService {
 
     final existing = await _repository.getConversation(conversationId);
     if (existing == null) {
-      throw ArgumentError('Conversation with ID "$conversationId" does not exist.');
+      throw ArgumentError(
+        'Conversation with ID "$conversationId" does not exist.',
+      );
     }
 
     // Auto-update title if it's the first message and still default
@@ -101,7 +106,9 @@ class ConversationHistoryService {
 
     final updated = await _repository.appendMessage(conversationId, msg);
     if (updated == null) {
-      throw ArgumentError('Conversation with ID "$conversationId" does not exist.');
+      throw ArgumentError(
+        'Conversation with ID "$conversationId" does not exist.',
+      );
     }
     return msg;
   }

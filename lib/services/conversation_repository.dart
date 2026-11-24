@@ -64,7 +64,8 @@ class InMemoryConversationRepository implements ConversationRepository {
     final current = _storage[conversationId];
     if (current == null) return null;
 
-    final updatedMessages = List<ChatMessage>.from(current.messages)..add(message);
+    final updatedMessages = List<ChatMessage>.from(current.messages)
+      ..add(message);
     final updated = current.copyWith(
       messages: updatedMessages,
       updatedAt: message.timestamp,

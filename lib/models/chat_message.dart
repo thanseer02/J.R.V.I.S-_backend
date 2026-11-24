@@ -48,11 +48,11 @@ class ChatMessage {
   }
 
   Map<String, dynamic> toJson() => {
-        'messageId': messageId,
-        'role': role.toJson(),
-        'content': content,
-        'timestamp': timestamp.toIso8601String(),
-      };
+    'messageId': messageId,
+    'role': role.toJson(),
+    'content': content,
+    'timestamp': timestamp.toIso8601String(),
+  };
 
   @override
   bool operator ==(Object other) =>
@@ -66,5 +66,8 @@ class ChatMessage {
 
   @override
   int get hashCode =>
-      messageId.hashCode ^ role.hashCode ^ content.hashCode ^ timestamp.hashCode;
+      messageId.hashCode ^
+      role.hashCode ^
+      content.hashCode ^
+      timestamp.hashCode;
 }

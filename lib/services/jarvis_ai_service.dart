@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:genkit/genkit.dart';
 import 'package:genkit_google_genai/genkit_google_genai.dart';
 
@@ -54,11 +55,11 @@ class JarvisChatResponse {
   });
 
   Map<String, dynamic> toJson() => {
-        'conversationId': conversationId,
-        'reply': reply,
-        'userMessage': userMessage.toJson(),
-        'assistantMessage': assistantMessage.toJson(),
-      };
+    'conversationId': conversationId,
+    'reply': reply,
+    'userMessage': userMessage.toJson(),
+    'assistantMessage': assistantMessage.toJson(),
+  };
 }
 
 /// Abstract contract for AI generation, enabling dependency injection and testing.
@@ -125,8 +126,8 @@ class JarvisAIService {
   JarvisAIService({
     AiGenerator? generator,
     ConversationHistoryService? historyService,
-  })  : _generator = generator ?? FlowAiGenerator(),
-        _historyService = historyService ?? ConversationHistoryService();
+  }) : _generator = generator ?? FlowAiGenerator(),
+       _historyService = historyService ?? ConversationHistoryService();
 
   /// Accessor for the underlying conversation history service.
   ConversationHistoryService get historyService => _historyService;
@@ -153,7 +154,9 @@ class JarvisAIService {
     if (conversationId == null || conversationId.trim().isEmpty) {
       conversation = await _historyService.startConversation();
     } else {
-      final existing = await _historyService.getConversation(conversationId.trim());
+      final existing = await _historyService.getConversation(
+        conversationId.trim(),
+      );
       if (existing == null) {
         throw ConversationNotFoundException(conversationId.trim());
       }

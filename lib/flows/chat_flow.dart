@@ -22,10 +22,7 @@ class FlowHistoryMessage {
     );
   }
 
-  Map<String, dynamic> toJson() => {
-        'role': role,
-        'content': content,
-      };
+  Map<String, dynamic> toJson() => {'role': role, 'content': content};
 
   static final schema = SchemanticType.from<FlowHistoryMessage>(
     jsonSchema: {
@@ -65,10 +62,10 @@ class JarvisChatInput {
   }
 
   Map<String, dynamic> toJson() => {
-        'message': message,
-        if (systemPrompt != null) 'systemPrompt': systemPrompt,
-        'history': history.map((m) => m.toJson()).toList(),
-      };
+    'message': message,
+    if (systemPrompt != null) 'systemPrompt': systemPrompt,
+    'history': history.map((m) => m.toJson()).toList(),
+  };
 
   static final schema = SchemanticType.from<JarvisChatInput>(
     jsonSchema: {
@@ -125,7 +122,8 @@ class JarvisChatFlow {
       outputSchema: SchemanticType.string(),
       fn: (input, context) async {
         final userMessage = input.message.trim();
-        final systemInstruction = (input.systemPrompt != null &&
+        final systemInstruction =
+            (input.systemPrompt != null &&
                 input.systemPrompt!.trim().isNotEmpty)
             ? input.systemPrompt!.trim()
             : JarvisPrompts.systemInstruction;

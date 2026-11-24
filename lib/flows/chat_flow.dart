@@ -3,28 +3,72 @@ import 'package:schemantic/schemantic.dart';
 
 import '../config/ai_config.dart';
 import '../config/jarvis_prompts.dart';
+import '../models/chat_message.dart';
 import '../tools/app_info_tool.dart';
 import '../tools/calculator_tool.dart';
 import '../tools/date_time_tool.dart';
 
-/// Input schema for the JARVIS chat flow.
-class JarvisChatInput {
-  final String message;
-  final String? systemPrompt;
+/// Serializable message history DTO for Genkit flow input.
+class FlowHistoryMessage {
+  final String role;
+  final String content;
 
-  const JarvisChatInput({required this.message, this.systemPrompt});
+  const FlowHistoryMessage({required this.role, required this.content});
 
-  factory JarvisChatInput.fromJson(Map<String, dynamic> json) {
-    return JarvisChatInput(
-      message: json['message'] as String? ?? '',
-      systemPrompt: json['systemPrompt'] as String?,
+  factory FlowHistoryMessage.fromJson(Map<String, dynamic> json) {
+    return FlowHistoryMessage(
+      role: json['role'] as String? ?? 'user',
+      content: json['content'] as String? ?? '',
     );
   }
 
   Map<String, dynamic> toJson() => {
-    'message': message,
-    if (systemPrompt != null) 'systemPrompt': systemPrompt,
-  };
+        'role': role,
+        'content': content,
+      };
+
+  static final schema = SchemanticType.from<FlowHistoryMessage>(
+    jsonSchema: {
+      'type': 'object',
+      'properties': {
+        'role': {'type': 'string'},
+        'content': {'type': 'string'},
+      },
+      'required': ['role', 'content'],
+    },
+    parse: (json) =>
+        FlowHistoryMessage.fromJson((json as Map).cast<String, dynamic>()),
+  );
+}
+
+/// Input schema for the JARVIS chat flow with optional message history.
+class JarvisChatInput {
+  final String message;
+  final String? systemPrompt;
+  final List<FlowHistoryMessage> history;
+
+  const JarvisChatInput({
+    required this.message,
+    this.systemPrompt,
+    this.history = const [],
+  });
+
+  factory JarvisChatInput.fromJson(Map<String, dynamic> json) {
+    final rawHistory = json['history'] as List<dynamic>? ?? [];
+    return JarvisChatInput(
+      message: json['message'] as String? ?? '',
+      systemPrompt: json['systemPrompt'] as String?,
+      history: rawHistory
+          .map((m) => FlowHistoryMessage.fromJson(m as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'message': message,
+        if (systemPrompt != null) 'systemPrompt': systemPrompt,
+        'history': history.map((m) => m.toJson()).toList(),
+      };
 
   static final schema = SchemanticType.from<JarvisChatInput>(
     jsonSchema: {
@@ -38,6 +82,11 @@ class JarvisChatInput {
           'type': 'string',
           'description': 'Optional custom system instruction',
         },
+        'history': {
+          'type': 'array',
+          'description': 'Previous conversation message history',
+          'items': FlowHistoryMessage.schema.jsonSchema(),
+        },
       },
       'required': ['message'],
     },
@@ -46,7 +95,7 @@ class JarvisChatInput {
   );
 }
 
-/// Flow definition and registration for JARVIS chat generation with tool support.
+/// Flow definition and registration for JARVIS chat generation with tool and history support.
 class JarvisChatFlow {
   JarvisChatFlow._();
 
@@ -76,16 +125,28 @@ class JarvisChatFlow {
       outputSchema: SchemanticType.string(),
       fn: (input, context) async {
         final userMessage = input.message.trim();
-        final systemInstruction =
-            (input.systemPrompt != null &&
+        final systemInstruction = (input.systemPrompt != null &&
                 input.systemPrompt!.trim().isNotEmpty)
             ? input.systemPrompt!.trim()
             : JarvisPrompts.systemInstruction;
+
+        // Map prior history into Genkit Message instances
+        final genkitMessages = <Message>[];
+        for (final item in input.history) {
+          final isUser = item.role == 'user';
+          genkitMessages.add(
+            Message(
+              role: isUser ? Role.user : Role.model,
+              content: [TextPart(text: item.content)],
+            ),
+          );
+        }
 
         final response = await genkit.generate(
           model: AiConfig.model,
           system: systemInstruction,
           prompt: userMessage,
+          messages: genkitMessages.isNotEmpty ? genkitMessages : null,
           tools: tools,
         );
 

@@ -149,7 +149,12 @@ class JarvisChatFlow {
 
         final replyText = response.text.trim();
         if (replyText.isEmpty) {
-          throw StateError('AI returned an empty response.');
+          final reason = response.finishMessage?.trim();
+          throw StateError(
+            (reason != null && reason.isNotEmpty)
+                ? reason
+                : 'AI returned an empty response.',
+          );
         }
 
         return replyText;

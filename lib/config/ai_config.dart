@@ -15,7 +15,7 @@ class AiConfig {
   /// Default model used by JARVIS.
   /// Can be overridden via `GEMINI_MODEL` environment variable.
   static String get defaultModelName =>
-      Env.get('GEMINI_MODEL', defaultValue: 'gemini-2.5-flash')!;
+      Env.get('GEMINI_MODEL', defaultValue: 'gemini-3.1-flash-lite')!;
 
   /// Model reference for Google Gemini configured for JARVIS.
   static ModelRef<GeminiOptions> get model => googleAI.gemini(defaultModelName);
